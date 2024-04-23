@@ -23,8 +23,6 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::get('/dashboard', function () {
-        $geojson = file_get_contents(resource_path('/geojson/monuments.geojson'));
-
-        return view('dashboard', ['geojson' => $geojson]);
+        return view('dashboard');
     })->name('dashboard');
 });
