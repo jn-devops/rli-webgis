@@ -15,7 +15,7 @@ return new class extends Migration
     public function up(): void
     {   
         // Example to get the path to your Excel file
-        $filePath = storage_path('app/excel/Agapeya.xlsx');
+        $filePath = storage_path('app/public/Agapeya.xlsx');
 
         // Load Excel data
         $data = Excel::import(new YourExcelImport, $filePath);
