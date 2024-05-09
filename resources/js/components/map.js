@@ -39,7 +39,6 @@ document.addEventListener("alpine:init", () => {
                     var centerCoordinates = [121.099711, 14.194851];
                     var projectLayerName = "spatial_agapeya_lot";
                     var projectRasterName = "";
-
                 } else if (mapData.map == "pvmp") {
                     var centerCoordinates = [120.645900, 15.239243];
                     var projectLayerName = "spatial_pvmp_lot";
@@ -54,6 +53,18 @@ document.addEventListener("alpine:init", () => {
                     var centerCoordinates = [120.809000, 14.330000];
                     var projectLayerName = "spatial_pvmp2_lot";
                     var projectRasterName = "rli_raster_phhilaga";
+                } else if (mapData.map == "ppsn") {
+                    var centerCoordinates = [120.7426265, 14.2990959];
+                    var projectLayerName = "spatial_ppsn_lot";
+                    var projectRasterName = "";
+                } else if (mapData.map == "phmp") {
+                    var centerCoordinates = [120.6572879, 15.2451355];
+                    var projectLayerName = "spatial_phmp_lot";
+                    var projectRasterName = "";
+                }  else if (mapData.map == "phem") {
+                    var centerCoordinates = [121.0027518, 14.8227769];
+                    var projectLayerName = "spatial_phem_lot";
+                    var projectRasterName = "";
                 } 
 
                 // 14.328204270996462, 120.80735613394836
