@@ -9,6 +9,7 @@
     <script>
         var GEOSERVER_URL = @json($GEOSERVER_URL);
         var GEOSERVER_WORKSPACE = @json($GEOSERVER_WORKSPACE);
+        var BOOKING_URL = @json($BOOKING_URL);
     </script>
 
     <!-- Fonts -->

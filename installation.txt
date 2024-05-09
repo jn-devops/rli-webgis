@@ -1,0 +1,130 @@
+=======================
+GeoServer Installation
+=======================
+
+Introduction:
+-------------
+
+GeoServer is a JAVA based application developed to ease the styling and sharing of geospatial data using Opensource technology. It follows the standards of the Open Geospatial Consortium (OGC) and thus has wide application in a variety of industries. GeoServer’s website provides comprehensive information regarding its usability and documentation.
+
+Installation Guide:
+--------------------
+
+Installing GeoServer in a GUI-based system such as Windows, Mac, or even Ubuntu GUI is straightforward. However, if you only have access to an SSH terminal, follow the steps below:
+
+Step 1: Check/Install JAVA 17:
+-------------------------------
+
+GeoServer currently supports JAVA-JRE-17. Install it using the following commands:
+
+    sudo apt-get update
+    sudo apt-get install openjdk-17-jdk
+    sudo apt-get install openjdk-17-jre
+
+Verify the installation by typing `java -version`.
+
+Step 2: Installation of Postgres (Optional):
+--------------------------------------------
+
+If you wish to use a database with GeoServer, it is recommended to install PostgreSQL. PostGIS is likely already installed if you're running PostgreSQL as a service from a cloud provider like DigitalOcean. To enable PostGIS, you can:
+
+1. Connect to your database as the postgres user or another super-user account.
+2. Run the command: CREATE EXTENSION postgis
+
+Step 3: Downloading GeoServer:
+-------------------------------
+
+Downloading GeoServer without a GUI requires manual downloading and installation. Visit the GeoServer build page (https://build.geoserver.org/geoserver/) to select the desired version. For example:
+
+    cd /usr/share
+    mkdir geoserver
+    cd geoserver
+    wget https://build.geoserver.org/geoserver/main/geoserver-main-latest-bin.zip
+
+Unzip the downloaded file:
+
+    unzip geoserver-main-latest-bin.zip
+
+Set up a variable:
+
+    echo "export GEOSERVER_HOME=/usr/share/geoserver" >> ~/.profile
+    . ~/.profile
+
+Ensure the correct ownership:
+
+    sudo chown -R USER_NAME /usr/share/geoserver/
+
+Step 4: Starting GeoServer:
+---------------------------
+
+Navigate to the bin directory and run startup.sh:
+
+    cd bin
+    sh startup.sh
+
+Once GeoServer is up and running, access it through a web browser using the designated port (usually 8080).
+
+Step 5: Configuring GeoServer for Usage and Running as a Service:
+-------------------------------------------------------------------
+
+To make GeoServer accessible publicly and resolve CORS issues, edit the web.xml file located at `geoserver/webapps/geoserver/WEB-INF`. Use a text editor like Vim:
+
+    sudo apt install vim
+    sudo vim web.xml
+
+Add the following lines to the web.xml file, replacing the URL with your chosen URL:
+
+    <context-param>
+      <param-name>PROXY_BASE_URL</param-name>
+      <param-value>https://map.homeful.ph/geoserver</param-value>
+    </context-param>
+
+    <context-param>
+      <param-name>GEOSERVER_CSRF_WHITELIST</param-name>
+      <param-value>homeful.ph,map.homeful.ph,map.homeful.ph/geoserver</param-value>
+    </context-param>
+
+Uncomment the CORS-related lines and save the changes. Then restart GeoServer.
+
+To run GeoServer as a service, follow the instructions provided in the official documentation: https://docs.geoserver.org/2.21.x/en/user/production/linuxscript.html
+
+Step 6: NGINX Configuration (Optional):
+----------------------------------------
+
+If you're using NGINX as a reverse proxy to serve GeoServer, you'll need to configure NGINX to pass requests to GeoServer. Add the following configuration to your NGINX configuration file (usually located at /etc/nginx/nginx.conf or in a site-specific configuration file):
+
+location /geoserver {
+proxy_pass http://localhost:8080/geoserver;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_redirect ~http://[^/]+(/.)$ $1;
+}
+
+
+Replace `/geoserver` with the URL path you want to use for GeoServer. After adding the configuration, restart NGINX for the changes to take effect.
+
+Step 7: Ensure GeoServer is Running Properly:
+----------------------------------------------
+
+Remove the Marlin renderer library jar file to ensure proper functioning:
+
+    rm webapps/geoserver/WEB-INF/lib/marlin-0.9.3.jar
+
+Step 8: Access GeoServer:
+--------------------------
+
+You can access GeoServer using the default credentials:
+Username: admin
+Password: geoserver
+
+Troubleshooting:
+-----------------
+
+If you encounter errors while accessing GeoServer, double-check the changes made in the web.xml file.
+
+Conclusion:
+------------
+
+GeoServer is now successfully installed and configured for usage. Enjoy leveraging its geospatial capabilities!

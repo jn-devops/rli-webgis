@@ -14,15 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-});
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+
+Route::get('view-map/{map?}/{sku?}', App\Http\Controllers\MapController::class)->name('view-map');
+Route::get('update-status/{property_code}', [App\Http\Controllers\MapActionsController::class, 'updateStatus']);
