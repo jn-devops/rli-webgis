@@ -33,7 +33,10 @@
             "RLI\\GIS\\": "src/app/",
             "RLI\\GIS\\Factories\\": "src/database/factories/",
             "RLI\\GIS\\Seeders\\": "src/database/seeders/"
-        }
+        },
+        "files": [
+            "src/app/Helpers/Utils.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

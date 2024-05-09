@@ -18,7 +18,7 @@ return new class extends Migration
         //$filePath = storage_path('app/public/Agapeya.xlsx');
 
         tap(documents_path('Agapeya.xlsx'), function ($path) {
-            if (file_exists($filePath)) Excel::import(new YourExcelImport, $filePath);
+            if (file_exists($path)) Excel::import(new YourExcelImport, $path);
         });
 
         // Load Excel data
