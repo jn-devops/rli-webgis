@@ -15,11 +15,14 @@ return new class extends Migration
     public function up(): void
     {   
         // Example to get the path to your Excel file
-        $filePath = storage_path('app/public/Agapeya.xlsx');
+        //$filePath = storage_path('app/public/Agapeya.xlsx');
+
+        tap(documents_path('Agapeya.xlsx'), function ($path) {
+            if (file_exists($filePath)) Excel::import(new YourExcelImport, $filePath);
+        });
 
         // Load Excel data
-        $data = Excel::import(new YourExcelImport, $filePath);
-        
+       
         // var_dump($data);
 
         // Loop through each row
