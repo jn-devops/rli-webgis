@@ -50,8 +50,8 @@ document.addEventListener("alpine:init", () => {
                     var projectRasterName = "rli_raster_pvmp";
                     
                 } else if (mapData.map == "phhilaga") {
-                    var centerCoordinates = [120.809000, 14.330000];
-                    var projectLayerName = "spatial_pvmp2_lot";
+                    var centerCoordinates = [120.8089878, 14.3298647];
+                    var projectLayerName = "spatial_phh1_lot";
                     var projectRasterName = "rli_raster_phhilaga";
                 } else if (mapData.map == "ppsn") {
                     var centerCoordinates = [120.7426265, 14.2990959];
