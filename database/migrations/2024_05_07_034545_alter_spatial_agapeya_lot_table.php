@@ -13,7 +13,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('spatial_agapeya_lot', function (Blueprint $table) {
-            $table->float('floor_area')->nullable();
             $table->string('type')->nullable();
             $table->string('orientation')->nullable();
             $table->string('color')->nullable();
@@ -40,7 +39,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('spatial_agapeya_lot', function (Blueprint $table) {
-            $table->dropColumn('floor_area');
             $table->dropColumn('type');
             $table->dropColumn('orientation');
             $table->dropColumn('color');
