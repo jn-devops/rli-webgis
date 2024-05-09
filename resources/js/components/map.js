@@ -60,7 +60,7 @@ document.addEventListener("alpine:init", () => {
                 } else if (mapData.map == "phmp") {
                     var centerCoordinates = [120.6572879, 15.2451355];
                     var projectLayerName = "spatial_phmp_lot";
-                    var projectRasterName = "";
+                    var projectRasterName = "rli_raster_ppmp_phmp";
                 }  else if (mapData.map == "phem") {
                     var centerCoordinates = [121.0027518, 14.8227769];
                     var projectLayerName = "spatial_phem_lot";
