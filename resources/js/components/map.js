@@ -43,7 +43,6 @@ document.addEventListener("alpine:init", () => {
                     var centerCoordinates = [120.645900, 15.239243];
                     var projectLayerName = "spatial_pvmp_lot";
                     var projectRasterName = "rli_raster_pvmp";
-
                 } else if (mapData.map == "pvmp2") {
                     var centerCoordinates = [120.645900, 15.239243];
                     var projectLayerName = "spatial_pvmp2_lot";
@@ -312,7 +311,7 @@ document.addEventListener("alpine:init", () => {
                 content += '<tr><td>Block: ' + feature.get('block') + ' Lot:  ' + feature.get('lot') + '</td></tr>';
                 content += '<tr><td>Lot & Floor Area: ' + feature.get('lot_area') +' sqm & '+ feature.get('floor_area') + ' sqm </td></tr>';
 
-                if (feature.get('status') === '1') {
+                if (feature.get('status') == '1') {
                     content += '<tr><td>Status: Available</td></tr>';
                 } else {
                     content += '<tr><td>Status: Not Available</td></tr>';
@@ -323,8 +322,8 @@ document.addEventListener("alpine:init", () => {
 
                 content += '<tr><td>Selling Price: ' + formattedPrice + '</td></tr>';
 
-                if (feature.get('status') === '1') {
-                    content += '<tr><td><a target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.sku + '/' + feature.get('property_c') + '/' + feature.get('property_c') + '">SELECT THIS PROPERTY</a></td></tr>';
+                if ( ( feature.get('status') == '1') &&  ( feature.get('sku') == mapData.sku ) ) {
+                    content += '<tr><td><a class="cool-button" target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.voucher + '/' + mapData.order + '/' + feature.get('property_c') + '">SELECT THIS PROPERTY</a></td></tr>';
                 }
 
                
@@ -375,7 +374,8 @@ document.addEventListener("alpine:init", () => {
                 // Define style based on the color value
                 if (mapData.sku) {
                     var skuValue = feature.get('sku');
-                    if (mapData.sku == skuValue) {
+
+                    if ((mapData.sku == skuValue) && ( feature.get('status') == '1')){
                         return new Style({
                             fill: new Fill({
                                 color: 'rgba(0, 128, 0)',

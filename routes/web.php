@@ -22,5 +22,5 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 
-Route::get('view-map/{map?}/{sku?}', App\Http\Controllers\MapController::class)->name('view-map');
+Route::get('view-map/{map?}/{sku?}/{voucher?}/{order?}', App\Http\Controllers\MapController::class)->name('view-map');
 Route::get('update-status/{property_code}', [App\Http\Controllers\MapActionsController::class, 'updateStatus']);

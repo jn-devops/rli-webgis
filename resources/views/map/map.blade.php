@@ -19,11 +19,16 @@
        
         const mapParam = request.map;
         const skuParam = request.sku;
+        const voucherParam = request.voucher;
+        const orderParam = request.order;
 
         const mapData = {
             map: mapParam,
-            sku: skuParam
+            sku: skuParam,
+            voucher: voucherParam,
+            order: orderParam,
         };
         
         console.log(mapData); // Output the received data to the console
 </script>
+
