@@ -213,26 +213,24 @@ document.addEventListener("alpine:init", () => {
 
 
                 let content = '<h4 class="text-gray-500 font-bold">' + jsonFeature.properties.property_c + '</h4>'
-
                 let image = jsonFeature.properties.image || '/img/placeholder-image.png'
                 content += '<img src="' + image + '" class="mt-2 w-full max-h-[200px] rounded-md shadow-md  overflow-clip">'
 
-                content += '<ul>';
-                content += '<li>SKU : ' + jsonFeature.properties.sku + '</li>';
-                content += '<li>Block : ' + jsonFeature.properties.block + '</li>';
-                content += '<li>Lot : ' + jsonFeature.properties.lot + '</li>';
-                content += '<li>Lot Area : ' + jsonFeature.properties.lot_area + '</li>';
-                content += '<li>Floor Area : ' + jsonFeature.properties.floor_area + '</li>';
+                content += '<table>';
+                content += '<tr><td>SKU</td><td>' + jsonFeature.properties.sku + '</td></tr>';
+                content += '<tr><td>Block / Lot</td><td>' + jsonFeature.properties.block + ' / ' + jsonFeature.properties.lot + '</td></tr>';
+                content += '<tr><td>Lot Area / Floor Area</td><td>' + jsonFeature.properties.lot_area + ' / ' + jsonFeature.properties.floor_area + '</td></tr>';
 
                 if (jsonFeature.properties.status === '1') {
-                    content += '<li>Status : Available <br> </li>';
+                    content += '<tr><td>Status</td><td>Available</td></tr>';
                 } else {
-                    content += '<li>Status : Not Available</li>';
+                    content += '<tr><td>Status</td><td>Not Available</td></tr>';
                 }
 
-                content += '<li>Selling Price : ' + jsonFeature.properties.ntcp + '</li>';
-                content += '<li><a href="reserve_link">Reserve this property</a></li>';
-                content += '</ul>';
+                content += '<tr><td>Selling Price</td><td>' + jsonFeature.properties.ntcp + '</td></tr>';
+                content += '<tr><td colspan="2"><a href="reserve_link">Reserve this property</a></td></tr>';
+                content += '</table>';
+
 
 
                 this.$refs.popupContent.innerHTML = content
@@ -307,24 +305,30 @@ document.addEventListener("alpine:init", () => {
                 let content = '<h4 class="text-gray-500 font-bold">' +  feature.get('property_c') + '</h4>'
 
                 let image = feature.get('image') || '/img/placeholder-image.png'
-                content += '<img src="' + image + '" class="mt-2 w-full max-h-[200px] rounded-md shadow-md  overflow-clip">'
+                content += '<img src="' + image + '" class="mt-2 w-1/2 max-h-[200px] rounded-md shadow-md  overflow-clip">'
 
-                content += '<ul>';
-                content += '<li>SKU : ' + feature.get('sku') + '</li>';
-                content += '<li>Block : ' + feature.get('block')  + '</li>';
-                content += '<li>Lot : ' + feature.get('lot')  + '</li>';
-                content += '<li>Lot Area : ' + feature.get('lot_area')  + '</li>';
-                content += '<li>Floor Area : ' + feature.get('floor_area')  + '</li>';
+                content += '<table border="1" style="border-collapse: collapse; width: 100%;" class="text-sm">';
+                content += '<tr><td>SKU: ' + feature.get('sku') + '</td></tr>';
+                content += '<tr><td>Block: ' + feature.get('block') + ' Lot:  ' + feature.get('lot') + '</td></tr>';
+                content += '<tr><td>Lot & Floor Area: ' + feature.get('lot_area') +' sqm & '+ feature.get('floor_area') + ' sqm </td></tr>';
 
                 if (feature.get('status') === '1') {
-                    content += '<li>Status : Available <br> </li>';
+                    content += '<tr><td>Status: Available</td></tr>';
                 } else {
-                    content += '<li>Status : Not Available</li>';
+                    content += '<tr><td>Status: Not Available</td></tr>';
                 }
 
-                content += '<li>Selling Price : ' + feature.get('ntcp') + '</li>';
-                content += '<li><a target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.sku + '/' + feature.get('property_c') +' /'+ feature.get('property_c') +'">SELECT THIS PROPERTY</a></b></li>';
-                content += '</ul>';
+                // Assuming the selling price needs to be formatted to USD
+                const formattedPrice = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'PHP' }).format(feature.get('ntcp'));
+
+                content += '<tr><td>Selling Price: ' + formattedPrice + '</td></tr>';
+
+                if (feature.get('status') === '1') {
+                    content += '<tr><td><a target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.sku + '/' + feature.get('property_c') + '/' + feature.get('property_c') + '">SELECT THIS PROPERTY</a></td></tr>';
+                }
+
+               
+                content += '</table>';
 
 
                 this.$refs.popupContent.innerHTML = content
