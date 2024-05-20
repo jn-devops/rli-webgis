@@ -38,21 +38,21 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('spatial_agapeya_lot', function (Blueprint $table) {
-            $table->dropColumn('type');
-            $table->dropColumn('orientation');
-            $table->dropColumn('color');
-            $table->dropColumn('sku');
-            $table->dropColumn('lot_price');
-            $table->dropColumn('house_price');
-            $table->dropColumn('premium');
-            $table->dropColumn('vat');
-            $table->dropColumn('tcp_duplex');
-            $table->dropColumn('discount');
-            $table->dropColumn('ntcp');
-            $table->dropColumn('image');
-            $table->dropColumn('created_at');
-            $table->dropColumn('updated_at');
-        });
+        // Schema::table('spatial_agapeya_lot', function (Blueprint $table) {
+        //     $table->dropColumn('type');
+        //     $table->dropColumn('orientation');
+        //     $table->dropColumn('color');
+        //     $table->dropColumn('sku');
+        //     $table->dropColumn('lot_price');
+        //     $table->dropColumn('house_price');
+        //     $table->dropColumn('premium');
+        //     $table->dropColumn('vat');
+        //     $table->dropColumn('tcp_duplex');
+        //     $table->dropColumn('discount');
+        //     $table->dropColumn('ntcp');
+        //     $table->dropColumn('image');
+        //     $table->dropColumn('created_at');
+        //     $table->dropColumn('updated_at');
+        // });
     }
 };
