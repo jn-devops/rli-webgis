@@ -34,10 +34,12 @@ document.addEventListener("alpine:init", () => {
                 var centerCoordinates = [121.099711, 14.194851];
                 var projectLayerName = "spatial_agapeya_lot";
                 var projectRasterName = "";
+                var blockLayerName = "";
 
                 if (mapData.map == "agapeya") {
                     var centerCoordinates = [121.099711, 14.194851];
                     var projectLayerName = "spatial_agapeya_lot";
+                    var blockLayerName = "spatial_agapeya_block";
                     var projectRasterName = "";
                 } else if (mapData.map == "pvmp") {
                     var centerCoordinates = [120.645900, 15.239243];
@@ -65,42 +67,7 @@ document.addEventListener("alpine:init", () => {
                     var projectLayerName = "spatial_phem_lot";
                     var projectRasterName = "";
                 } 
-
-                // 14.328204270996462, 120.80735613394836
-
-                // this.$watch('activeTab', (value) => {
-                //     this.stopDrawMonument()
-                // })
-
-                // this.draw = new Draw({
-                //     source: this.source,
-                //     type: 'Point',
-                // });
-
-                this.projectRaster = new TileLayer({
-                    source: new TileWMS({
-                        url: GEOSERVER_URL + '/wms',
-                        params: {
-                            'LAYERS': GEOSERVER_WORKSPACE + ':' + projectRasterName,
-                            'TILED': true
-                        },
-                        serverType: 'geoserver',
-                    }),
-                    label: 'Raster File',
-                });
-
-                // this.projectLayer = new TileLayer({
-                //     source: new TileWMS({
-                //         url: GEOSERVER_URL + '/wms',
-                //         params: {
-                //             'LAYERS': GEOSERVER_WORKSPACE + ':' + projectLayerName,
-                //             'TILED': true
-                //         },
-                //         serverType: 'geoserver',
-                //     }),
-                //     label: 'Raster File'
-                // });
-
+                
                 this.projectLayer = new VectorLayer({
                     source: new VectorSource({
                         format: new GeoJSON(),
@@ -113,18 +80,54 @@ document.addEventListener("alpine:init", () => {
                         strategy: bboxStrategy,
                     }),
                     style: this.defaultStyleProject,
-                    label: 'World Rivers',
+                    label: 'Project Layer',
                 });
+
+
+                // this.blockLayer = "";
+                // if (blockLayerName) {
+                    this.blockLayer = new VectorLayer({
+                        source: new VectorSource({
+                            format: new GeoJSON(),
+                            url: (extent) => {
+                                paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + blockLayerName;
+                                paramsObj.bbox = extent.join(",") + ",EPSG:4326";
+                                let urlParams = new URLSearchParams(paramsObj);
+                                return GEOSERVER_URL + '/wfs?' + urlParams.toString();
+                            },
+                            strategy: bboxStrategy,
+                        }),
+                        style: this.defaultStyleBlock,
+                        label: 'Block Layer',
+                    });
+                // }
+
+                // this.projectRaster = "";
+
+                // if (projectRasterName) {
+                    this.projectRaster = new TileLayer({
+                        source: new TileWMS({
+                            url: GEOSERVER_URL + '/wms',
+                            params: {
+                                'LAYERS': GEOSERVER_WORKSPACE + ':' + projectRasterName,
+                                'TILED': true
+                            },
+                            serverType: 'geoserver',
+                        }),
+                        label: 'Raster Layer',
+                    });
+                // }
 
                 this.map = new Map({
                     target: this.$refs.map,
                     layers: [
-                        new TileLayer({
+                         new TileLayer({
                             source: new OSM(),
                             label: 'OpenStreetMap',
                         }),
-                        this.projectRaster,
                         this.projectLayer,
+                        this.blockLayer,
+                        this.projectRaster,
                     ],
                     view: new View({
                         projection: "EPSG:4326",
@@ -140,39 +143,13 @@ document.addEventListener("alpine:init", () => {
                     ],
                 });
 
-                // this.map.on("singleclick", (event) => {
-                //     if (event.dragging) {
-                //         return;
-                //     }
+                let previousFeature = null;
 
-                //     let overlay = this.map.getOverlayById('info')
-                //     overlay.setPosition(undefined)
-                //     this.$refs.popupContent.innerHTML = ''
-
-                //     const viewResolution = /** @type {number} */ (event.map.getView().getResolution())
-
-                //     const url = this.projectLayer.getSource().getFeatureInfoUrl(
-                //         event.coordinate,
-                //         viewResolution,
-                //         'EPSG:4326', {
-                //             'INFO_FORMAT': 'application/json'
-                //         })
-
-                //     console.log(url);
-
-                //     if (url) {
-                //         fetch(url)
-                //             .then((response) => response.json())
-                //             .then((json) => {
-                //                 if (json.features.length > 0) {
-                //                     this.gotoPolygon(json.features[0])
-                //                 }
-                //             });
-                //     }
-
-                // });
+                // Assuming `topLayer` is defined and references the topmost layer
+                const topLayer = this.map.getLayers().getArray()[1]; // Adjust the index if necessary
 
                 this.map.on("singleclick", (event) => {
+
                     if (event.dragging) {
                         return;
                     }
@@ -186,10 +163,25 @@ document.addEventListener("alpine:init", () => {
                         event.pixel,
                         (feature, layer) => {
                             this.gotoFeature(feature)
-                            return
+
+                            // Reset the style of the previously selected feature
+                            if (previousFeature) {
+                                previousFeature.setStyle(this.defaultStyleProject);
+                            }
+
+                            feature.setStyle(this.createSelectedStyle);
+
+                            // Update the reference to the currently selected feature
+                            previousFeature = feature;
+
+                            return true;  // Stop iteration after the first feature is found
+
                         },
                         {
                             hitTolerance: 5,
+                            layerFilter: function (layer) {
+                                return layer === topLayer;
+                            }
                         }
                     );
                 });
@@ -199,46 +191,6 @@ document.addEventListener("alpine:init", () => {
                 let overlay = this.map.getOverlayById('info')
                 overlay.setPosition(undefined)
                 this.$refs.popupContent.innerHTML = ''
-            },
-            gotoPolygon(jsonFeature) {
-                // Assuming jsonFeature is an object containing the JSON data
-                const coordinates = jsonFeature.geometry.coordinates[0][0][0]; // Accessing the coordinates
-
-                this.map.getView().animate({
-                    center: coordinates,
-                    zoom: 20,
-                    duration: 500,
-                });
-
-
-                let content = '<h4 class="text-gray-500 font-bold">' + jsonFeature.properties.property_c + '</h4>'
-                let image = jsonFeature.properties.image || '/img/placeholder-image.png'
-                content += '<img src="' + image + '" class="mt-2 w-full max-h-[200px] rounded-md shadow-md  overflow-clip">'
-
-                content += '<table>';
-                content += '<tr><td>SKU</td><td>' + jsonFeature.properties.sku + '</td></tr>';
-                content += '<tr><td>Block / Lot</td><td>' + jsonFeature.properties.block + ' / ' + jsonFeature.properties.lot + '</td></tr>';
-                content += '<tr><td>Lot Area / Floor Area</td><td>' + jsonFeature.properties.lot_area + ' / ' + jsonFeature.properties.floor_area + '</td></tr>';
-
-                if (jsonFeature.properties.status === '1') {
-                    content += '<tr><td>Status</td><td>Available</td></tr>';
-                } else {
-                    content += '<tr><td>Status</td><td>Not Available</td></tr>';
-                }
-
-                content += '<tr><td>Selling Price</td><td>' + jsonFeature.properties.ntcp + '</td></tr>';
-                content += '<tr><td colspan="2"><a href="reserve_link">Reserve this property</a></td></tr>';
-                content += '</table>';
-
-
-
-                this.$refs.popupContent.innerHTML = content
-
-                setTimeout(() => {
-                    this.map.getOverlayById('info').setPosition(
-                        coordinates
-                    );
-                }, 500)
             },
             gotoFeature(feature) {
 
@@ -345,17 +297,20 @@ document.addEventListener("alpine:init", () => {
             defaultStyleProject(feature, resolution) {
                 let text;
                 let width = 2;
+                var lotValue = String(feature.get('lot'));
                 
+                // alert(resolution);
+                // 0.000005364418029785156
                 // if(resolution < 0.002){
-                    text = new Text({
-                        font: "20px serif",
-                        text: feature.get("property_c"),
-                        fill: new Fill({
-                            color: "rgba(0, 0, 255, 1)",
-                        }),
-                    });
+                    // text = new Text({
+                    //     font: "20px serif",
+                    //     text: lotValue,
+                    //     fill: new Fill({
+                    //         color: "rgba(0, 0, 255, 1)",
+                    //     }),
+                    // });
 
-                    width = 4;
+                    // width = 4;
                 // }
 
                 // Get the value of the "color" field from the feature's properties
@@ -384,7 +339,13 @@ document.addEventListener("alpine:init", () => {
                                 color: '#FF0000', 
                                 width: 1
                             }),
-                            text: text,
+                             text: new Text({
+                                font: "10px serif bold",
+                                text: lotValue,
+                                fill: new Fill({
+                                    color: "rgba(32, 32, 32, 1)",
+                                }),
+                            }),
                         });
                     } else {
                         return new Style({
@@ -395,7 +356,13 @@ document.addEventListener("alpine:init", () => {
                                 color: '#FF0000', 
                                 width: 1
                             }),
-                            text: text,
+                            text: new Text({
+                                font: "10px serif bold",
+                                text: lotValue,
+                                fill: new Fill({
+                                    color: "rgba(32, 32, 32, 1)",
+                                }),
+                            }),
                         });
                     }
 
@@ -410,7 +377,13 @@ document.addEventListener("alpine:init", () => {
                                 color: '#FF0000', 
                                 width: 1
                             }),
-                            text: text,
+                             text: new Text({
+                                font: "10px serif bold",
+                                text: lotValue,
+                                fill: new Fill({
+                                    color: "rgba(32, 32, 32, 1)",
+                                }),
+                            }),
                         });
                     } else  {
                         return new Style({
@@ -421,7 +394,13 @@ document.addEventListener("alpine:init", () => {
                                 color: '#0000FF', 
                                 width: 1
                             }),
-                            text: text,
+                             text: new Text({
+                                font: "10px serif bold",
+                                text: lotValue,
+                                fill: new Fill({
+                                    color: "rgba(32, 32, 32, 1)",
+                                }),
+                            }),
                         });
                     }
                 }
@@ -436,6 +415,55 @@ document.addEventListener("alpine:init", () => {
 
                 // Return default style if no specific color matches
                 return defaultStyle;
+            },
+            defaultStyleBlock(feature, resolution) {
+                let text;
+                let width = 2;
+                var blockValue = String(feature.get('block'));
+                
+                // Get the value of the "color" field from the feature's properties
+                var colorValue = feature.get('color');
+                // Define default style
+                var defaultStyle = new Style({
+                    stroke: new Stroke({
+                        color: '#FF0000', // Default stroke color
+                        width: 1
+                    }),
+                    text: new Text({
+                        font: "32px serif bold",
+                        text: blockValue,
+                        fill: new Fill({
+                            color: "blue",
+                        }),
+                        backgroundFill: new Fill({
+                            color: "rgba(255, 255, 255, 0.5)",
+                        }),
+                        padding: [2, 2, 2, 2]
+                    }),
+                });
+
+                // Return default style if no specific color matches
+                return defaultStyle;
+            },
+            createSelectedStyle(feature, resolution) {
+                var lotValue = String(feature.get('lot'));
+
+                return new Style({
+                    fill: new Fill({
+                        color: 'rgba(255, 0, 0, 0.6)'  // Red color with some transparency
+                    }),
+                    stroke: new Stroke({
+                        color: '#ff0000',
+                        width: 2
+                    }),
+                    text: new Text({
+                        font: "10px serif bold",
+                        text: lotValue,
+                        fill: new Fill({
+                            color: "blue",
+                        }),
+                    }),
+                });
             },
             goToDefaultExtent() {
                 // Get the default extent coordinates based on the map data
