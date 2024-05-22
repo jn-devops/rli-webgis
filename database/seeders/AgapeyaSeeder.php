@@ -14,9 +14,10 @@ class AgapeyaSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        
         tap(documents_path('agapeya_project_attributes.xlsx'), function ($path) {
             if (file_exists($path)) UploadProjectAttributesAction::run($path);
         });
     }
 }
+

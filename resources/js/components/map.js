@@ -32,42 +32,75 @@ document.addEventListener("alpine:init", () => {
                 };
 
                 var centerCoordinates = [121.099711, 14.194851];
-                var projectLayerName = "spatial_agapeya_lot";
+                var lotLayerName = "spatial_agapeya_lot";
                 var projectRasterName = "";
                 var blockLayerName = "";
+                var phaseLayerName = "";
+                var projectLayerName = "";
 
                 if (mapData.map == "agapeya") {
                     var centerCoordinates = [121.099711, 14.194851];
-                    var projectLayerName = "spatial_agapeya_lot";
+                    var lotLayerName = "spatial_agapeya_lot";
                     var blockLayerName = "spatial_agapeya_block";
+                    var phaseLayerName = "spatial_agapeya_phase";
+                    var projectLayerName = "spatial_agapeya_project";
                     var projectRasterName = "";
                 } else if (mapData.map == "pvmp") {
                     var centerCoordinates = [120.645900, 15.239243];
-                    var projectLayerName = "spatial_pvmp_lot";
+                    var lotLayerName = "spatial_pvmp_lot";
                     var projectRasterName = "rli_raster_pvmp";
                 } else if (mapData.map == "pvmp2") {
                     var centerCoordinates = [120.645900, 15.239243];
-                    var projectLayerName = "spatial_pvmp2_lot";
+                    var lotLayerName = "spatial_pvmp2_lot";
                     var projectRasterName = "rli_raster_pvmp";
-                    
                 } else if (mapData.map == "phhilaga") {
                     var centerCoordinates = [120.8089878, 14.3298647];
-                    var projectLayerName = "spatial_phh1_lot";
+                    var lotLayerName = "spatial_phh1_lot";
                     var projectRasterName = "rli_raster_phhilaga";
                 } else if (mapData.map == "ppsn") {
                     var centerCoordinates = [120.7426265, 14.2990959];
-                    var projectLayerName = "spatial_ppsn_lot";
+                    var lotLayerName = "spatial_ppsn_lot";
                     var projectRasterName = "";
                 } else if (mapData.map == "phmp") {
                     var centerCoordinates = [120.6572879, 15.2451355];
-                    var projectLayerName = "spatial_phmp_lot";
+                    var lotLayerName = "spatial_phmp_lot";
                     var projectRasterName = "rli_raster_ppmp_phmp";
-                }  else if (mapData.map == "phem") {
+                } else if (mapData.map == "phem") {
                     var centerCoordinates = [121.0027518, 14.8227769];
-                    var projectLayerName = "spatial_phem_lot";
+                    var lotLayerName = "spatial_phem_lot";
                     var projectRasterName = "";
                 } 
                 
+                this.blockLayer = new VectorLayer({
+                    source: new VectorSource({
+                        format: new GeoJSON(),
+                        url: (extent) => {
+                            paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + blockLayerName;
+                            paramsObj.bbox = extent.join(",") + ",EPSG:4326";
+                            let urlParams = new URLSearchParams(paramsObj);
+                            return GEOSERVER_URL + '/wfs?' + urlParams.toString();
+                        },
+                        strategy: bboxStrategy,
+                    }),
+                    style: this.defaultStyleBlock,
+                    label: 'Block Layer',
+                });
+
+                this.phaseLayer = new VectorLayer({
+                    source: new VectorSource({
+                        format: new GeoJSON(),
+                        url: (extent) => {
+                            paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + phaseLayerName;
+                            paramsObj.bbox = extent.join(",") + ",EPSG:4326";
+                            let urlParams = new URLSearchParams(paramsObj);
+                            return GEOSERVER_URL + '/wfs?' + urlParams.toString();
+                        },
+                        strategy: bboxStrategy,
+                    }),
+                    style: this.defaultStylePhase,
+                    label: 'Phase Layer',
+                });
+
                 this.projectLayer = new VectorLayer({
                     source: new VectorSource({
                         format: new GeoJSON(),
@@ -83,41 +116,33 @@ document.addEventListener("alpine:init", () => {
                     label: 'Project Layer',
                 });
 
+                this.projectRaster = new TileLayer({
+                    source: new TileWMS({
+                        url: GEOSERVER_URL + '/wms',
+                        params: {
+                            'LAYERS': GEOSERVER_WORKSPACE + ':' + projectRasterName,
+                            'TILED': true
+                        },
+                        serverType: 'geoserver',
+                    }),
+                    label: 'Raster Layer',
+                });
 
-                // this.blockLayer = "";
-                // if (blockLayerName) {
-                    this.blockLayer = new VectorLayer({
-                        source: new VectorSource({
-                            format: new GeoJSON(),
-                            url: (extent) => {
-                                paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + blockLayerName;
-                                paramsObj.bbox = extent.join(",") + ",EPSG:4326";
-                                let urlParams = new URLSearchParams(paramsObj);
-                                return GEOSERVER_URL + '/wfs?' + urlParams.toString();
-                            },
-                            strategy: bboxStrategy,
-                        }),
-                        style: this.defaultStyleBlock,
-                        label: 'Block Layer',
-                    });
-                // }
-
-                // this.projectRaster = "";
-
-                // if (projectRasterName) {
-                    this.projectRaster = new TileLayer({
-                        source: new TileWMS({
-                            url: GEOSERVER_URL + '/wms',
-                            params: {
-                                'LAYERS': GEOSERVER_WORKSPACE + ':' + projectRasterName,
-                                'TILED': true
-                            },
-                            serverType: 'geoserver',
-                        }),
-                        label: 'Raster Layer',
-                    });
-                // }
-
+                this.lotLayer = new VectorLayer({
+                    source: new VectorSource({
+                        format: new GeoJSON(),
+                        url: (extent) => {
+                            paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + lotLayerName;
+                            paramsObj.bbox = extent.join(",") + ",EPSG:4326";
+                            let urlParams = new URLSearchParams(paramsObj);
+                            return GEOSERVER_URL + '/wfs?' + urlParams.toString();
+                        },
+                        strategy: bboxStrategy,
+                    }),
+                    style: this.defaultStyleLot,
+                    label: 'Lot Layer',
+                });
+                
                 this.map = new Map({
                     target: this.$refs.map,
                     layers: [
@@ -125,8 +150,10 @@ document.addEventListener("alpine:init", () => {
                             source: new OSM(),
                             label: 'OpenStreetMap',
                         }),
-                        this.projectLayer,
+                        this.lotLayer,
                         this.blockLayer,
+                        this.phaseLayer,
+                        this.projectLayer,
                         this.projectRaster,
                     ],
                     view: new View({
@@ -162,11 +189,14 @@ document.addEventListener("alpine:init", () => {
                     this.map.forEachFeatureAtPixel(
                         event.pixel,
                         (feature, layer) => {
+                            
+                            // console.log(layer.getProperties());
+
                             this.gotoFeature(feature)
 
                             // Reset the style of the previously selected feature
                             if (previousFeature) {
-                                previousFeature.setStyle(this.defaultStyleProject);
+                                previousFeature.setStyle(this.defaultStyleLot);
                             }
 
                             feature.setStyle(this.createSelectedStyle);
@@ -175,7 +205,6 @@ document.addEventListener("alpine:init", () => {
                             previousFeature = feature;
 
                             return true;  // Stop iteration after the first feature is found
-
                         },
                         {
                             hitTolerance: 5,
@@ -185,7 +214,6 @@ document.addEventListener("alpine:init", () => {
                         }
                     );
                 });
-
             },
             closePopup() {
                 let overlay = this.map.getOverlayById('info')
@@ -193,6 +221,49 @@ document.addEventListener("alpine:init", () => {
                 this.$refs.popupContent.innerHTML = ''
             },
             gotoFeature(feature) {
+
+                // Fetch the block attribute from the project feature
+                var blockAttribute = feature.get('block');
+                var phaseAttribute = String(feature.get('phase'));
+                var projectAttribute = feature.get('project_co');
+
+                console.log('project: ' + projectAttribute + ' phase: ' + phaseAttribute + ' block: '  + blockAttribute  );
+
+                // Filter the block layer based on the block attribute
+                const blockFeatures = this.blockLayer.getSource().getFeatures();
+                const matchingBlockFeatures = blockFeatures.filter(feature => feature.get('block') === blockAttribute);
+                const blockFeature = '';
+
+                const phaseFeatures = this.phaseLayer.getSource().getFeatures();
+                const matchingPhaseFeatures = phaseFeatures.filter(feature => feature.get('phase') === phaseAttribute);
+                const phaseFeature = '';
+
+                const projectFeatures = this.projectLayer.getSource().getFeatures();
+                const matchingProjectFeatures = projectFeatures.filter(feature => feature.get('project_co') === projectAttribute);
+                const projectFeature = '';
+
+                var blockStatus = 0;
+                var lotStatus = 0;
+                var projectStatus = 0;
+
+                if (matchingBlockFeatures.length > 0) {
+                    const blockFeature = matchingBlockFeatures[0];
+                    var blockStatus = blockFeature.get('status');
+                    console.log('Matching block feature:', blockStatus);
+                }
+
+                if (matchingPhaseFeatures.length > 0) {
+                    const phaseFeature = matchingPhaseFeatures[0];
+                    var phaseStatus = phaseFeature.get('status');
+                    console.log('Matching phase feature:', phaseStatus);
+                }
+
+                 if (matchingProjectFeatures.length > 0) {
+                    const projectFeature = matchingProjectFeatures[0];
+                    var projectStatus = projectFeature.get('status');
+                    console.log('Matching project feature:', projectStatus);
+                }
+                
 
                 let overlay = this.map.getOverlayById('info')
                 overlay.setPosition(undefined)
@@ -236,34 +307,35 @@ document.addEventListener("alpine:init", () => {
                     return [centroidX, centroidY];
                 }
 
-                // const coordinates = feature.geometry.coordinates[0][0][0]; // Accessing the coordinates
                 this.map.getView().animate({
                     center: centroid,
                     zoom: 20,
                     duration: 500,
                 });
 
-                // let content =
-                //     '<h4 class="text-gray-500 font-bold">' +
-                //     feature.get('property_c') +
-                //     '</h4>'
-
-                // content +=
-                //     '<img src="' +
-                //     feature.get('image') +
-                //     '" class="mt-2 w-full max-h-[200px] rounded-md shadow-md object-contain overflow-clip">'
-
                 let content = '<h4 class="text-gray-500 font-bold">' +  feature.get('property_c') + '</h4>'
 
+                // var imageUrl = feature.get('image') || '/img/placeholder-image.png';
+
+                // this.checkImage(imageUrl, function(isValid) {
+                //     if (isValid) {
+                //         // Image is not broken, you can use it
+                //         content += '<img src="' + imageUrl + '" class="mt-2 w-1/2 max-h-[200px] rounded-md shadow-md  overflow-clip">';
+                //     } else {
+                //         // Image is broken, use placeholder instead
+                //         var placeholderUrl = '/img/placeholder-image.png';
+                //         content += '<img src="' + placeholderUrl + '" class="mt-2 w-1/2 max-h-[200px] rounded-md shadow-md  overflow-clip">';
+                //     }
+                // });
                 let image = feature.get('image') || '/img/placeholder-image.png'
                 content += '<img src="' + image + '" class="mt-2 w-1/2 max-h-[200px] rounded-md shadow-md  overflow-clip">'
 
                 content += '<table border="1" style="border-collapse: collapse; width: 100%;" class="text-sm">';
-                content += '<tr><td>SKU: ' + feature.get('sku') + '</td></tr>';
-                content += '<tr><td>Block: ' + feature.get('block') + ' Lot:  ' + feature.get('lot') + '</td></tr>';
-                content += '<tr><td>Lot & Floor Area: ' + feature.get('lot_area') +' sqm & '+ feature.get('floor_area') + ' sqm </td></tr>';
+                content += '<tr><td>Block: ' + feature.get('block') + ' Lot: ' + feature.get('lot') + '</td></tr>';
+                content += '<tr><td>Lot Area: ' + feature.get('lot_area') + ' sqm</td></tr>';
+                content += '<tr><td>Floor Area: ' + feature.get('floor_area') + ' sqm</td></tr>';
 
-                if (feature.get('status') == '1') {
+                if ((feature.get('status') == '1') && (feature.get('sku') == mapData.sku) && (blockStatus == 1)  && (phaseStatus == 1)  && (projectStatus == 1) ) {
                     content += '<tr><td>Status: Available</td></tr>';
                 } else {
                     content += '<tr><td>Status: Not Available</td></tr>';
@@ -271,15 +343,43 @@ document.addEventListener("alpine:init", () => {
 
                 // Assuming the selling price needs to be formatted to USD
                 const formattedPrice = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'PHP' }).format(feature.get('ntcp'));
-
                 content += '<tr><td>Selling Price: ' + formattedPrice + '</td></tr>';
+                
+                // Document checklist section
+                // let documentChecklist = feature.get('document_checklist');
 
-                if ( ( feature.get('status') == '1') &&  ( feature.get('sku') == mapData.sku ) ) {
+                // if (documentChecklist) {
+                //     try {
+                //         documentChecklist = JSON.parse(documentChecklist);
+                //     } catch (e) {
+                //         console.error('Failed to parse document checklist JSON:', e);
+                //         documentChecklist = null;
+                //     }
+                // }
+
+                // if (documentChecklist && Array.isArray(documentChecklist) && documentChecklist.length > 0) {
+                //     content += '<tr><td colspan="2">Document Checklist:</td></tr>';
+                //     documentChecklist.forEach(document => {
+                //         content += '<tr><td><a href="' + document.url + '" target="_blank">' + document.document_name + '</a></td></tr>';
+                //     });
+                // } else if (documentChecklist && typeof documentChecklist === 'object') {
+                //     content += '<tr><td colspan="2">Document Checklist:</td></tr>';
+                //     for (const key in documentChecklist) {
+                //         if (documentChecklist.hasOwnProperty(key)) {
+                //             const document = documentChecklist[key];
+                //             content += '<tr><td><a href="' + document.url + '" target="_blank">' + document.document_name + '</a></td></tr>';
+                //         }
+                //     }
+                // }
+
+                console.log('project: ' + projectStatus + ' phase: ' + phaseStatus + ' block: '  + blockStatus  );
+
+                if ((feature.get('status') == '1') && (feature.get('sku') == mapData.sku) && (blockStatus == 1)  && (phaseStatus == 1)  && (projectStatus == 1) ) {
                     content += '<tr><td><a class="cool-button" target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.voucher + '/' + mapData.order + '/' + feature.get('property_c') + '">SELECT THIS PROPERTY</a></td></tr>';
                 }
 
-               
                 content += '</table>';
+
 
 
                 this.$refs.popupContent.innerHTML = content
@@ -294,25 +394,11 @@ document.addEventListener("alpine:init", () => {
                     );
                 }, 500)
             },
-            defaultStyleProject(feature, resolution) {
+            defaultStyleLot(feature, resolution) {
                 let text;
                 let width = 2;
                 var lotValue = String(feature.get('lot'));
-                
-                // alert(resolution);
-                // 0.000005364418029785156
-                // if(resolution < 0.002){
-                    // text = new Text({
-                    //     font: "20px serif",
-                    //     text: lotValue,
-                    //     fill: new Fill({
-                    //         color: "rgba(0, 0, 255, 1)",
-                    //     }),
-                    // });
-
-                    // width = 4;
-                // }
-
+            
                 // Get the value of the "color" field from the feature's properties
                 var colorValue = feature.get('color');
                 // Define default style
@@ -321,7 +407,7 @@ document.addEventListener("alpine:init", () => {
                         color: 'rgba(255, 255, 255, 0.4)' // Default fill color
                     }),
                     stroke: new Stroke({
-                        color: '#3399CC', // Default stroke color
+                        color: 'pink', // Default stroke color
                         width: 1
                     })
                 });
@@ -330,13 +416,15 @@ document.addEventListener("alpine:init", () => {
                 if (mapData.sku) {
                     var skuValue = feature.get('sku');
 
-                    if ((mapData.sku == skuValue) && ( feature.get('status') == '1')){
+                    // if ((mapData.sku == skuValue) && ( feature.get('status') == '1') && (blockFeature.get('status') == '1') && (phaseFeature.get('status') == '1') ){
+
+                    if ((mapData.sku == skuValue) && ( feature.get('status') == '1') ){
                         return new Style({
                             fill: new Fill({
                                 color: 'rgba(0, 128, 0)',
                             }),
                             stroke: new Stroke({
-                                color: '#FF0000', 
+                                color: 'pink', 
                                 width: 1
                             }),
                              text: new Text({
@@ -353,7 +441,7 @@ document.addEventListener("alpine:init", () => {
                                 color: 'rgba(128, 128, 128)',
                             }),
                             stroke: new Stroke({
-                                color: '#FF0000', 
+                                color: 'pink', 
                                 width: 1
                             }),
                             text: new Text({
@@ -365,7 +453,6 @@ document.addEventListener("alpine:init", () => {
                             }),
                         });
                     }
-
                 } else {
                     if (colorValue) {
                         return new Style({
@@ -404,15 +491,6 @@ document.addEventListener("alpine:init", () => {
                         });
                     }
                 }
-                
-                
-                // 'red': 'rgba(255, 0, 0, 0.4)',
-                // 'blue': 'rgba(0, 0, 255, 0.4)',
-                // 'yellow': 'rgba(255, 255, 0, 0.4)',
-                // 'pink': 'rgba(255, 192, 203, 0.4)',
-                // 'green': 'rgba(0, 128, 0, 0.4)',
-                // 'purple': 'rgba(128, 0, 128, 0.4)'
-
                 // Return default style if no specific color matches
                 return defaultStyle;
             },
@@ -421,26 +499,104 @@ document.addEventListener("alpine:init", () => {
                 let width = 2;
                 var blockValue = String(feature.get('block'));
                 
-                // Get the value of the "color" field from the feature's properties
-                var colorValue = feature.get('color');
-                // Define default style
-                var defaultStyle = new Style({
-                    stroke: new Stroke({
-                        color: '#FF0000', // Default stroke color
-                        width: 1
-                    }),
-                    text: new Text({
-                        font: "32px serif bold",
-                        text: blockValue,
+                if ( ( feature.get('status') == '1') ){
+                    // Define default style
+                    var defaultStyle = new Style({
+                        stroke: new Stroke({
+                            color: 'pink', // Default stroke color
+                            width: 1
+                        }),
+                        text: new Text({
+                            font: "32px serif bold",
+                            text: blockValue,
+                            fill: new Fill({
+                                color: "red",
+                            }),
+                            backgroundFill: new Fill({
+                                color: "rgba(255, 255, 255, 0)",
+                            }),
+                            padding: [2, 2, 2, 2]
+                        }),
+                    });
+                } else {
+                    // Define default style
+                    var defaultStyle = new Style({
                         fill: new Fill({
-                            color: "blue",
+                            color: 'rgba(128, 128, 128)',
                         }),
-                        backgroundFill: new Fill({
-                            color: "rgba(255, 255, 255, 0.5)",
+                        stroke: new Stroke({
+                            color: 'pink', 
+                            width: 1
                         }),
-                        padding: [2, 2, 2, 2]
-                    }),
-                });
+                        text: new Text({
+                            font: "32px serif bold",
+                            text: blockValue,
+                            fill: new Fill({
+                                color: "rgba(32, 32, 32, 1)",
+                            }),
+                        }),
+                    });
+                }
+
+                // Return default style if no specific color matches
+                return defaultStyle;
+            },
+            defaultStylePhase(feature, resolution) {
+                
+                if ( ( feature.get('status') == '1') ){
+
+                    // Define default style
+                    var defaultStyle = new Style({
+                        stroke: new Stroke({
+                            color: 'pink', // Default stroke color
+                            width: 1
+                        }),
+                    });
+
+                } else {
+
+                    // Define default style
+                    var defaultStyle = new Style({
+                        fill: new Fill({
+                            color: 'rgba(128, 128, 128)',
+                        }),
+                        stroke: new Stroke({
+                            color: 'pink', 
+                            width: 1
+                        }),
+                    });
+
+                }
+
+                // Return default style if no specific color matches
+                return defaultStyle;
+            },
+            defaultStyleProject(feature, resolution) {
+               
+                 if ( ( feature.get('status') == '1') ){
+
+                    // Define default style
+                    var defaultStyle = new Style({
+                        stroke: new Stroke({
+                            color: 'pink', // Default stroke color
+                            width: 2
+                        }),
+                    });
+
+                } else {
+
+                    // Define default style
+                    var defaultStyle = new Style({
+                        fill: new Fill({
+                            color: 'rgba(128, 128, 128)',
+                        }),
+                        stroke: new Stroke({
+                            color: 'pink', 
+                            width: 2
+                        }),
+                    });
+                    
+                }
 
                 // Return default style if no specific color matches
                 return defaultStyle;
@@ -484,6 +640,16 @@ document.addEventListener("alpine:init", () => {
                 });
                 closePopup()
             },
+            checkImage(url, callback) {
+                var img = new Image();
+                img.onload = function() {
+                    callback(true);
+                };
+                img.onerror = function() {
+                    callback(false);
+                };
+                img.src = url;
+            }
 
             // hasLegend(layer) {
             //     return layer.getSource() instanceof TileWMS
