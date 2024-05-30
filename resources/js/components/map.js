@@ -189,7 +189,7 @@ document.addEventListener("alpine:init", () => {
                     this.map.forEachFeatureAtPixel(
                         event.pixel,
                         (feature, layer) => {
-                            
+
                             // console.log(layer.getProperties());
 
                             this.gotoFeature(feature)
@@ -665,4 +665,11 @@ document.addEventListener("alpine:init", () => {
             // }
         };
     });
+});
+
+// Event listener for dropdown changes
+document.getElementById('layer-select').addEventListener('change', function () {
+    const selectedLayer = this.value;
+    const newUrl = `${window.location.origin}/view-map/${selectedLayer}`;
+    window.location.href = newUrl;  // Change the URL and reload the page
 });

@@ -14,6 +14,19 @@
             </div>
         </div>
         
+         <!-- Dropdown for selecting map layers -->
+        <div class="absolute top-1 left-9 z-10 rounded-md bg-white bg-opacity-75 p-2">
+            <select id="layer-select" class="form-select">
+                <option value="agapeya">AGAPEYA</option>
+                <option value="pvmp">PVMP</option>
+                <option value="pvmp2">PVMP2</option>
+                <option value="phhilaga">PHHILAGA</option>
+                <option value="ppsn">PPSN</option>
+                <option value="phmp">PHMP</option>
+                <option value="phem">PHEM</option>
+            </select>
+        </div>
+        
         <div x-cloak x-ref="popup" class="ol-popup ol-control transition">
             <div class="m-0.5 rounded-md bg-white p-2">
                 <div class="flex justify-between">
