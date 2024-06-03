@@ -269,6 +269,7 @@ document.addEventListener("alpine:init", () => {
                 var phaseAttribute = String(feature.get('phase'));
                 var projectAttribute = feature.get('project_co');
 
+
                 console.log('project: ' + projectAttribute + ' phase: ' + phaseAttribute + ' block: '  + blockAttribute  );
 
                 // Filter the block layer based on the block attribute
