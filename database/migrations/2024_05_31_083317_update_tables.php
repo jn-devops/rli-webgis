@@ -19,7 +19,7 @@ return new class extends Migration
         Schema::dropIfExists('project_attributes');
 
         // Rename tables
-        Schema::rename('project_informations', 'projects');
+        // Schema::rename('project_informations', 'projects');
         // Schema::rename('spatial_agapeya_lot', 'spatial_agm_lot');
         // Schema::rename('spatial_agapeya_block', 'spatial_agm_block');
         // Schema::rename('spatial_agapeya_phase', 'spatial_agm_phase');
