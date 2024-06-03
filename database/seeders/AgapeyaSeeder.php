@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use RLI\GIS\Actions\UploadProjectAttributesAction;
-
+use RLI\GIS\Actions\UploadAgapeyaAttributesAction;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +14,8 @@ class AgapeyaSeeder extends Seeder
     public function run(): void
     {
         
-        tap(documents_path('agapeya_project_attributes.xlsx'), function ($path) {
-            if (file_exists($path)) UploadProjectAttributesAction::run($path);
+        tap(documents_path('Agapeya.xlsx'), function ($path) {
+            if (file_exists($path)) UploadAgapeyaAttributesAction::run($path);
         });
     }
 }
-

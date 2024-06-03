@@ -4,7 +4,7 @@ namespace RLI\GIS\Imports;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ProductsImport implements WithMultipleSheets
+class ProjectsImport implements WithMultipleSheets
 {
     public function sheets(): array
     {

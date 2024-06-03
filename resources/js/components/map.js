@@ -32,42 +32,68 @@ document.addEventListener("alpine:init", () => {
                 };
 
                 var centerCoordinates = [121.099711, 14.194851];
-                var lotLayerName = "spatial_agapeya_lot";
+                var lotLayerName = "spatial_agm_lot";
                 var projectRasterName = "";
-                var blockLayerName = "";
-                var phaseLayerName = "";
-                var projectLayerName = "";
+                var blockLayerName = "spatial_agm_block";
+                var phaseLayerName = "spatial_agm_phase";
+                var projectLayerName = "spatial_agm_project";
+                var cfLayerName = "spatial_agm_cf";
 
                 if (mapData.map == "agapeya") {
                     var centerCoordinates = [121.099711, 14.194851];
-                    var lotLayerName = "spatial_agapeya_lot";
-                    var blockLayerName = "spatial_agapeya_block";
-                    var phaseLayerName = "spatial_agapeya_phase";
-                    var projectLayerName = "spatial_agapeya_project";
+                    var lotLayerName = "spatial_agm_lot";
+                    var blockLayerName = "spatial_agm_block";
+                    var phaseLayerName = "spatial_agm_phase";
+                    var projectLayerName = "spatial_agm_project";
+                    var cfLayerName = "";
                     var projectRasterName = "";
                 } else if (mapData.map == "pvmp") {
                     var centerCoordinates = [120.645900, 15.239243];
                     var lotLayerName = "spatial_pvmp_lot";
+                    var blockLayerName = "spatial_pvmp_block";
+                    var phaseLayerName = "spatial_pvmp_phase";
+                    var projectLayerName = "spatial_pvmp_project";
+                    var cfLayerName = "spatial_pvmp_cf";
                     var projectRasterName = "rli_raster_pvmp";
                 } else if (mapData.map == "pvmp2") {
                     var centerCoordinates = [120.645900, 15.239243];
                     var lotLayerName = "spatial_pvmp2_lot";
+                    var blockLayerName = "spatial_pvmp2_block";
+                    var phaseLayerName = "spatial_pvmp2_phase";
+                    var projectLayerName = "spatial_pvmp2_project";
+                    var cfLayerName = "spatial_pvmp2_cf";
                     var projectRasterName = "rli_raster_pvmp";
                 } else if (mapData.map == "phhilaga") {
                     var centerCoordinates = [120.8089878, 14.3298647];
                     var lotLayerName = "spatial_phh1_lot";
+                    var blockLayerName = "spatial_phh1_block";
+                    var phaseLayerName = "spatial_phh1_phase";
+                    var projectLayerName = "spatial_phh1_project";
+                    var cfLayerName = "spatial_phh1_cf";
                     var projectRasterName = "rli_raster_phhilaga";
                 } else if (mapData.map == "ppsn") {
                     var centerCoordinates = [120.7426265, 14.2990959];
                     var lotLayerName = "spatial_ppsn_lot";
+                    var blockLayerName = "spatial_ppsn_block";
+                    var phaseLayerName = "spatial_ppsn_phase";
+                    var projectLayerName = "spatial_ppsn_project";
+                    var cfLayerName = "spatial_ppsn_cf";
                     var projectRasterName = "";
                 } else if (mapData.map == "phmp") {
                     var centerCoordinates = [120.6572879, 15.2451355];
                     var lotLayerName = "spatial_phmp_lot";
+                    var blockLayerName = "spatial_phmp_block";
+                    var phaseLayerName = "spatial_phmp_phase";
+                    var projectLayerName = "spatial_phmp_project";
+                    var cfLayerName = "spatial_phmp_cf";
                     var projectRasterName = "rli_raster_ppmp_phmp";
                 } else if (mapData.map == "phem") {
                     var centerCoordinates = [121.0027518, 14.8227769];
                     var lotLayerName = "spatial_phem_lot";
+                    var blockLayerName = "spatial_phem_block";
+                    var phaseLayerName = "spatial_phem_phase";
+                    var projectLayerName = "spatial_phem_project";
+                    var cfLayerName = "spatial_phem_cf";
                     var projectRasterName = "";
                 } 
                 
@@ -84,6 +110,21 @@ document.addEventListener("alpine:init", () => {
                     }),
                     style: this.defaultStyleBlock,
                     label: 'Block Layer',
+                });
+
+                this.cfLayer = new VectorLayer({
+                    source: new VectorSource({
+                        format: new GeoJSON(),
+                        url: (extent) => {
+                            paramsObj.typeName = GEOSERVER_WORKSPACE + ':' + cfLayerName;
+                            paramsObj.bbox = extent.join(",") + ",EPSG:4326";
+                            let urlParams = new URLSearchParams(paramsObj);
+                            return GEOSERVER_URL + '/wfs?' + urlParams.toString();
+                        },
+                        strategy: bboxStrategy,
+                    }),
+                    style: this.defaultStyleCF,
+                    label: 'CF Layer',
                 });
 
                 this.phaseLayer = new VectorLayer({
@@ -146,15 +187,16 @@ document.addEventListener("alpine:init", () => {
                 this.map = new Map({
                     target: this.$refs.map,
                     layers: [
-                         new TileLayer({
+                        new TileLayer({
                             source: new OSM(),
                             label: 'OpenStreetMap',
                         }),
+                        this.projectRaster,
                         this.lotLayer,
+                        this.cfLayer,
                         this.blockLayer,
                         this.phaseLayer,
                         this.projectLayer,
-                        this.projectRaster,
                     ],
                     view: new View({
                         projection: "EPSG:4326",
@@ -173,7 +215,7 @@ document.addEventListener("alpine:init", () => {
                 let previousFeature = null;
 
                 // Assuming `topLayer` is defined and references the topmost layer
-                const topLayer = this.map.getLayers().getArray()[1]; // Adjust the index if necessary
+                const topLayer = this.map.getLayers().getArray()[2]; // Adjust the index if necessary
 
                 this.map.on("singleclick", (event) => {
 
@@ -313,7 +355,7 @@ document.addEventListener("alpine:init", () => {
                     duration: 500,
                 });
 
-                let content = '<h4 class="text-gray-500 font-bold">' +  feature.get('property_c') + '</h4>'
+                let content = '<h4 class="text-gray-500 font-bold">' +  feature.get('code') + '</h4>'
 
                 // var imageUrl = feature.get('image') || '/img/placeholder-image.png';
 
@@ -375,7 +417,7 @@ document.addEventListener("alpine:init", () => {
                 console.log('project: ' + projectStatus + ' phase: ' + phaseStatus + ' block: '  + blockStatus  );
 
                 if ((feature.get('status') == '1') && (feature.get('sku') == mapData.sku) && (blockStatus == 1)  && (phaseStatus == 1)  && (projectStatus == 1) ) {
-                    content += '<tr><td><a class="cool-button" target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.voucher + '/' + mapData.order + '/' + feature.get('property_c') + '">SELECT THIS PROPERTY</a></td></tr>';
+                    content += '<tr><td><a class="cool-button" target="_self" href="' + BOOKING_URL + '/edit-order/' + mapData.voucher + '/' + mapData.order + '/' + feature.get('code') + '">SELECT THIS PROPERTY</a></td></tr>';
                 }
 
                 content += '</table>';
@@ -537,6 +579,37 @@ document.addEventListener("alpine:init", () => {
                         }),
                     });
                 }
+
+                // Return default style if no specific color matches
+                return defaultStyle;
+            },
+            defaultStyleCF(feature, resolution) {
+                let text;
+                let width = 2;
+                var blockValue = String(feature.get('remarks'));
+                
+                // Define default style
+                var defaultStyle = new Style({
+                    fill: new Fill({
+                        color: 'skyblue',
+                    }),
+                    stroke: new Stroke({
+                        color: 'pink', // Default stroke color
+                        width: 1
+                    }),
+                    text: new Text({
+                        font: "32px serif bold",
+                        text: blockValue,
+                        fill: new Fill({
+                            color: "red",
+                        }),
+                        backgroundFill: new Fill({
+                            color: "rgba(255, 255, 255, 0)",
+                        }),
+                        padding: [2, 2, 2, 2]
+                    }),
+                });
+               
 
                 // Return default style if no specific color matches
                 return defaultStyle;

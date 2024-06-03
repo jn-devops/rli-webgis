@@ -11,7 +11,7 @@ class SpatialAgapeyaLot extends Model
      *
      * @var string
      */
-    protected $table = 'spatial_agapeya_lot';
+    protected $table = 'spatial_agm_lot';
 
     /**
      * The primary key associated with the table.
@@ -33,7 +33,7 @@ class SpatialAgapeyaLot extends Model
      * @var array
      */
     protected $fillable = [
-        'property_c',
+        'code',
         'status',
         'floor_area',
         'lot_area',
