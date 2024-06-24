@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAG-IBIG HELP SEMINAR APP</title>
+    <title>PAG-IBIG SEMINAR APP</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <h1>PAG-IBIG HELP SEMINAR APP</h1>
+    <h1>PAG-IBIG SEMINAR APP</h1>
     <div id="player"></div>
     <div class="container">
         <video id="camera" width="320" height="240" autoplay></video>
