@@ -95,6 +95,14 @@ document.addEventListener("alpine:init", () => {
                     var projectLayerName = "spatial_phem_project";
                     var cfLayerName = "spatial_phem_cf";
                     var projectRasterName = "";
+                } else if (mapData.map == "ppmp") {
+                    var centerCoordinates = [120.6587756, 15.2478576];
+                    var lotLayerName = "spatial_ppmp_lot";
+                    var blockLayerName = "spatial_ppmp_block";
+                    var phaseLayerName = "spatial_ppmp_phase";
+                    var projectLayerName = "spatial_ppmp_project";
+                    var cfLayerName = "spatial_ppmp_cf";
+                    var projectRasterName = "";
                 } 
                 
                 this.blockLayer = new VectorLayer({

@@ -24,3 +24,4 @@ Route::get('/dashboard', function () {
 
 Route::get('view-map/{map?}/{sku?}/{voucher?}/{order?}', App\Http\Controllers\MapController::class)->name('view-map');
 Route::get('update-status/{property_code}', [App\Http\Controllers\MapActionsController::class, 'updateStatus']);
+Route::get('pagibig-seminar/{sku?}', \App\Http\Controllers\VideoController::class)->name('pagibig-seminar');
