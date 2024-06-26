@@ -103,6 +103,30 @@ document.addEventListener("alpine:init", () => {
                     var projectLayerName = "spatial_ppmp_project";
                     var cfLayerName = "spatial_ppmp_cf";
                     var projectRasterName = "";
+                }  else if (mapData.map == "pvsn") {
+                    var centerCoordinates = [120.7450694, 14.2989752];
+                    var lotLayerName = "spatial_pvsn_lot";
+                    var blockLayerName = "spatial_pvsn_block";
+                    var phaseLayerName = "spatial_pvsn_phase";
+                    var projectLayerName = "spatial_pvsn_project";
+                    var cfLayerName = "spatial_pvsn_cf";
+                    var projectRasterName = "";
+                }  else if (mapData.map == "phsn") {
+                    var centerCoordinates = [120.741825, 14.304405];
+                    var lotLayerName = "spatial_phsn_lot";
+                    var blockLayerName = "spatial_phsn_block";
+                    var phaseLayerName = "spatial_phsn_phase";
+                    var projectLayerName = "spatial_phsn_project";
+                    var cfLayerName = "spatial_phsn_cf";
+                    var projectRasterName = "";
+                }  else if (mapData.map == "ppem") {
+                    var centerCoordinates = [121.0028849, 14.8210429];
+                    var lotLayerName = "spatial_ppem_lot";
+                    var blockLayerName = "spatial_ppem_block";
+                    var phaseLayerName = "spatial_ppem_phase";
+                    var projectLayerName = "spatial_ppem_project";
+                    var cfLayerName = "spatial_ppem_cf";
+                    var projectRasterName = "";
                 } 
                 
                 this.blockLayer = new VectorLayer({

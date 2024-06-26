@@ -25,6 +25,9 @@
                 <option value="phmp">PHMP</option>
                 <option value="phem">PHEM</option>
                 <option value="ppmp">PPMP</option>
+                <option value="pvsn">PVSN</option>
+                <option value="phsn">PSHN</option>
+                <option value="ppem">PPEM</option>
             </select>
         </div>
         
